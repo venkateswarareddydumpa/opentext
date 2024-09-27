@@ -1,0 +1,39 @@
+Sizing1: &sizing1 
+  OS:  OS "Redhat 7.9"
+  Size: SIZE "Standard D2as v4"
+  Location: "West Europe"
+  Zone: "Zone 1"
+Sizing2: &sizing2
+  OS:  OS "Redhat 8.4"
+  Size: SIZE "Standard D4as v8"
+  Location: "North Europe"
+  Zone: "Zone 2"
+DbServer: &DbServer pweotpgcdtlnx02
+
+
+OTCS_Server:
+  name: "sotcscdtlnx01"
+  <<: *sizing1
+  DB:
+    type : P
+    server: *DbServer
+    username: otcs
+    database: otcsdb  
+
+OTDS_Server:
+  <<: *sizing2
+  name: "sotdscdtlnx01"
+  DB:
+    type : P
+    server: *DbServer
+    username: otds
+    database: otdsdb  
+
+OTAC_Server:
+  <<: *sizing2
+  name: "sotaccdtlnx01"
+  DB:
+    type : P
+    server: *DbServer
+    username: ecr
+    database: ECR  

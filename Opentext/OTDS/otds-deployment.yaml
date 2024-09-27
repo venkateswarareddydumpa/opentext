@@ -1,0 +1,52 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otds-deployment
+  labels:
+    app: otds-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otds
+  template:
+    metadata:
+      labels:
+        app: otds
+    spec:
+      containers:
+      - name: otds
+        image: registry.opentext.com/otds-server:24.1.0
+        env:
+          - name: "OTDS_JAKARTA_PERSISTENCE_JDBC_PASSWORD"
+            value: "postgres"
+          - name: "OTDS_JAKARTA_PERSISTENCE_JDBC_USER"
+            value: "postgres"
+          - name: "OTDS_JAKARTA_PERSISTENCE_JDBC_URL"
+            value: "jdbc:postgresql://pgdb:5432/otdsdb"
+          - name: "OTDS_DIRECTORY_BOOTSTRAP_INITIALPASSWORD"
+            value: "Password@!"
+          - name: "OTDS_DIRECTORY_BOOTSTRAP_CRYPTSECRET"
+            value: "MTIzNDU2Nzg5MGFiY2RlZg=="
+          - name: "OTDS_MIGRATE"
+            value: "false"
+        ports:
+        - containerPort: 80
+          name: otds
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: otds
+  name: otds
+spec:
+  type: NodePort
+  ports:
+  - name: "otds-service"
+    port: 8080
+    targetPort: 8080
+    nodePort: 31001
+  selector:
+    app: otds
+  

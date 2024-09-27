@@ -1,0 +1,50 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: pgdb-deployment
+  name: pgdb-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: pgdb
+  template:
+    metadata:
+      labels:
+        app: pgdb
+    spec:
+      containers:
+      - image: postgres:13
+        name: postgres
+        env:
+        - name: POSTGRES_USER
+          value: postgres
+        - name: POSTGRES_PASSWORD
+          value: postgres
+        ports:
+        - containerPort: 5432
+          name: postgres
+        volumeMounts:
+          - mountPath: /var/lib/postgresql/data
+            name: db-data
+      volumes:
+        - name: db-data
+          emptyDir: {} #ensuring data persists even if the container restarts.
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: pgdb
+  name: pgdb
+spec:
+  type: NodePort
+  ports:
+  - name: "pgdb-service"
+    port: 5432
+    targetPort: 5432
+    nodePort: 31002
+  selector:
+    app: pgdb

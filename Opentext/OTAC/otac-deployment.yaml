@@ -1,0 +1,80 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: otac-deployment
+  labels:
+    app: otac-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: otac
+  template:
+    metadata:
+      labels:
+        app: otac
+    spec:
+      containers:
+      - name: otac
+        image: registry.opentext.com/otac:24.1.0
+        env:
+          - name: "bizHost"
+            value: "otac-0"
+          - name: "acProtocol"
+            value: "http"
+          - name: "resType"
+            value: "AC"
+          - name: "acPostAcConfig"
+            value: "false"
+          - name: "dbType"
+            value: "postgres"
+          - name: "targetDBName"
+            value: "ECR"
+          - name: "targetDBUserName"
+            value: "ecr"
+          - name: "DBHOST"
+            value: "pgdb"
+          - name: "DBPORT"
+            value: "5432"
+          - name: "DBUSER"
+            value: "postgres"
+          - name: "TARGET_DB_PASSWORD"
+            value: "Password@!"
+          - name: "OTAC_DB_ADMIN_PASSWORD"
+            value: "postgres"
+          - name: "otdsAdmin"
+            value: "admin"
+          - name: "otdsTomcatHostname"
+            value: "otds"
+          - name: "otdsTomcatPort"
+            value: "8080"
+          - name: "otdsTomcatProtocol"
+            value: "http"
+          - name: "OTDS_PASS"
+            value: "Password@!"
+          - name: otdsTomcatHostname
+            value: otds  
+          - name: "SHARED_ADDRESS_SPACE_NAT"
+            value: "false"
+          - name: "TZ"
+            value: "Etc/UTC"
+        ports:
+        - containerPort: 80
+          name: otds
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: otac
+  name: otac
+spec:
+  type: NodePort
+  ports:
+  - name: "otac-service"
+    port: 8080
+    targetPort: 8080
+    nodePort: 31003
+  selector:
+    app: otac
+  
